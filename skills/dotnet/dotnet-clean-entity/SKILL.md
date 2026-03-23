@@ -2,28 +2,28 @@
 name: dotnet-clean-entity
 description: >
   Generate rich domain entities for ASP.NET Core Clean Architecture projects.
-  Produces entities with private setters and a static factory method (Create)
-  following DDD Rich Domain Model patterns. Domain layer only — no EF config,
-  repositories, or DI. Use whenever the user wants to create/add a new entity,
-  model, aggregate, or domain object in a .NET project. Trigger on: "tạo entity",
-  "thêm entity", "add entity", "create entity Product", "tạo model Order",
-  "tạo aggregate", "thêm domain object", or any request about domain entities
-  with factory methods or encapsulation. Even if user just says "tạo entity X",
-  use this skill — all entities follow rich domain model by default.
+  Produces entities with a static factory method (Create) following DDD Rich
+  Domain Model patterns. Domain layer only — no EF config, repositories, or DI.
+  Use whenever the user wants to create/add a new entity, model, aggregate, or
+  domain object in a .NET project. Trigger on: "tạo entity", "thêm entity",
+  "add entity", "create entity Product", "tạo model Order", "tạo aggregate",
+  "thêm domain object", or any request about domain entities with factory
+  methods or encapsulation. Even if user just says "tạo entity X", use this
+  skill — all entities follow rich domain model by default.
 ---
 
 # ASP.NET Core — Rich Domain Entity Generator
 
 Generates domain entities following **Rich Domain Model** / DDD patterns:
-private setters and a static factory method `Create(...)`.
+public setters and a static factory method `Create(...)`.
 This skill focuses exclusively on the **Domain layer** — no infrastructure
 code is generated.
 
 ## Core Principles
 
-1. **No public setters** — all properties use `private set` (or `init` for
-   immutable fields like Id). External code cannot silently mutate entity
-   state.
+1. **Public setters** — all properties use `{ get; set; }`. Encapsulation is
+   enforced at the boundary through the `Create()` factory method, not through
+   accessor restrictions.
 2. **Static factory method `Create(...)`** — the only way to instantiate.
    Accepts all required parameters and returns a fully initialized entity.
 3. **Private constructor** — prevents `new {Entity}()` from outside. Only
@@ -36,19 +36,19 @@ code is generated.
 ## Prerequisite: BaseEntity
 
 Before generating any concrete entity, check that the base entity classes
-exist in `src/{ProjectName}.Domain/Entities/`. If they don't, create both
-files below.
+exist in `src/{ProjectName}.Domain/Abstractions/`. If they don't, create both
+classes below in the same file.
 
 ### BaseEntity\<TKey\> — generic version
 
-Create `src/{ProjectName}.Domain/Entities/BaseEntity.cs`:
+Create `src/{ProjectName}.Domain/Abstractions/BaseEntity.cs`:
 
 ```csharp
-namespace {ProjectName}.Domain.Entities;
+namespace {ProjectName}.Domain.Abstractions;
 
 public abstract class BaseEntity<TKey> where TKey : notnull
 {
-    public TKey Id { get; init; } = default!;
+    public TKey Id { get; set; } = default!;
 
     public DateTime CreatedAt { get; set; }
     public string? CreatedBy { get; set; }
@@ -56,9 +56,9 @@ public abstract class BaseEntity<TKey> where TKey : notnull
     public DateTime? UpdatedAt { get; set; }
     public string? UpdatedBy { get; set; }
 
-    public bool IsDeleted { get; private set; }
+    public bool IsDeleted { get; set; }
 
-    protected BaseEntity() 
+    protected BaseEntity()
     {
         CreatedAt = DateTime.UtcNow;
     }
@@ -73,7 +73,7 @@ public abstract class BaseEntity<TKey> where TKey : notnull
 ### BaseEntity — Guid shorthand
 
 Most entities use `Guid` as key. Provide a non-generic shorthand in the
-**same file**, right below the generic class:
+**same file** (`BaseEntity.cs`), right below the generic class:
 
 ```csharp
 public abstract class BaseEntity : BaseEntity<Guid>
@@ -133,17 +133,19 @@ Create `src/{ProjectName}.Domain/Entities/{EntityName}.cs` following this
 template:
 
 ```csharp
+using {ProjectName}.Domain.Abstractions;
+
 namespace {ProjectName}.Domain.Entities;
 
 public class {EntityName} : BaseEntity
 {
     // ── Properties ────────────────────────────────────────
-    // All properties: private set. Required props use null! initializer.
+    // All properties: public set. Required props use null! initializer.
     // Optional (nullable) props don't need initializer.
-    public string Name { get; private set; } = null!;
-    public decimal Price { get; private set; }
-    public string? Description { get; private set; }
-    public Guid CategoryId { get; private set; }
+    public string Name { get; set; } = null!;
+    public decimal Price { get; set; }
+    public string? Description { get; set; }
+    public Guid CategoryId { get; set; }
 
     // Navigation properties (no setter — EF loads them)
     public Category? Category { get; }
@@ -181,8 +183,7 @@ public class {EntityName} : BaseEntity
    initializer. Required parameters should NOT have default values.
 
 3. **Property access levels:**
-   - Scalar properties: `{ get; private set; }`
-   - Immutable properties (rarely change): consider `{ get; init; }`
+   - Scalar properties: `{ get; set; }`
    - Navigation references: `{ get; }` only (no setter, EF loads them)
    - Collection navigations: private backing field + public read-only accessor:
 
@@ -236,6 +237,7 @@ public enum OrderStatus
 `src/{ProjectName}.Domain/Entities/Order.cs`:
 
 ```csharp
+using {ProjectName}.Domain.Abstractions;
 using {ProjectName}.Domain.Enums;
 
 namespace {ProjectName}.Domain.Entities;
@@ -243,11 +245,11 @@ namespace {ProjectName}.Domain.Entities;
 public class Order : BaseEntity
 {
     // ── Properties ────────────────────────────────────────
-    public string CustomerName { get; private set; } = null!;
-    public string ShippingAddress { get; private set; } = null!;
-    public decimal TotalAmount { get; private set; }
-    public OrderStatus Status { get; private set; }
-    public string? Note { get; private set; }
+    public string CustomerName { get; set; } = null!;
+    public string ShippingAddress { get; set; } = null!;
+    public decimal TotalAmount { get; set; }
+    public OrderStatus Status { get; set; }
+    public string? Note { get; set; }
 
     // ── Collection Navigation ─────────────────────────────
     private readonly List<OrderItem> _items = [];
@@ -317,8 +319,7 @@ Key patterns in this example:
 - Each transition method checks the current state before allowing the change.
 - The transition methods throw `InvalidOperationException` with a clear
   message explaining why the transition is not allowed.
-- The entity controls its own state machine — no external code can set
-  `Status` directly.
+- The entity controls its own state machine through domain methods.
 
 ---
 

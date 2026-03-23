@@ -42,7 +42,7 @@ src/{ProjectName}.Infrastructure/ → has AppDbContext and repositories
 
 Check what features/entities exist so you know what test classes to generate:
 - Minimal API endpoints in `API/Endpoints/` or controllers in `API/Controllers/`
-- Repository interfaces in `Domain/Interfaces/`
+- Repository interfaces in `Domain/Abstractions/`
 - `AppDbContext` in `Infrastructure/Data/`
 
 ### Step 2 — Create the IntegrationTests Project
@@ -166,20 +166,20 @@ You don't need all of these for every feature — generate what makes sense for 
 Use `SeedAsync` from `IntegrationTestBase` to insert test data before each test:
 
 ```csharp
-// Single entity
-var product = new Product { Name = "Test", Price = 9.99m };
+
+var product = Product.Create("Test", 9.99m, categoryId);
 await SeedAsync(product);
 
 // Multiple entities
 var products = new[]
 {
-    new Product { Name = "A", Price = 1m },
-    new Product { Name = "B", Price = 2m },
+    Product.Create("A", 1m, categoryId),
+    Product.Create("B", 2m, categoryId),
 };
 await SeedAsync(products);
 ```
 
-`SeedAsync` sets `Id` if it's a `Guid` default — the entity object you passed in will have its `Id` populated after the call, so you can use `product.Id` in subsequent assertions.
+`SeedAsync` adds the entity to the DbContext and calls SaveChangesAsync — the entity's `Id` (set inside `Create()`) is available immediately after the call, so you can use `product.Id` in subsequent assertions.
 
 ### Authentication
 

@@ -47,33 +47,31 @@ The heart of the system. Contains:
 - **Abstractions** — `IRepository<T>`, `IUnitOfWork`, `Result<T>`, `Error`
 
 **Rich Domain Model**: business rules and invariants live *inside* entities as methods,
-not in external service classes. Entities protect their own state through private setters
-and expose behavior through meaningful methods.
+not in external service classes.
 
 ```csharp
 // ✅ Rich domain model — entity enforces its own invariants
 public class Order : BaseEntity
 {
     private readonly List<OrderItem> _items = [];
-    public IReadOnlyList<OrderItem> Items => _items.AsReadOnly();
-    public OrderStatus Status { get; private set; } = OrderStatus.Draft;
+    public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
+    public OrderStatus Status { get; set; } = OrderStatus.Draft;
 
-    public Result AddItem(Product product, int quantity)
+    public void AddItem(Product product, int quantity)
     {
         if (Status != OrderStatus.Draft)
-            return Result.Failure(OrderErrors.NotDraft);
+            throw new InvalidOperationException(
+                $"Cannot add items to an order in '{Status}' status.");
 
         _items.Add(new OrderItem(product, quantity));
-        return Result.Success();
     }
 
-    public Result Submit()
+    public void Submit()
     {
         if (!_items.Any())
-            return Result.Failure(OrderErrors.EmptyOrder);
+            throw new InvalidOperationException("Cannot submit an empty order.");
 
         Status = OrderStatus.Submitted;
-        return Result.Success();
     }
 }
 
@@ -96,7 +94,7 @@ public class OrderService  // ← logic scattered here instead
 ### Application layer
 
 Orchestrates use cases. Contains:
-- **Commands & Queries** — CQRS request objects (`CreateOrderCommand`, `GetOrderQuery`)
+- **Commands & Queries** — CQRS request objects (`CreateOrderCommand`, `GetOrderQuery`), plus the `ICommand` and `IQuery` marker interfaces they implement
 - **Handlers** — `ICommandHandler<TCommand>`, `IQueryHandler<TQuery, TResponse>`
 - **DTOs / Responses** — `OrderResponse`, `OrderSummary`
 - **Validators** — FluentValidation classes
@@ -108,19 +106,25 @@ repository interfaces from Domain — never EF Core's `DbContext` directly.
 
 ```csharp
 // ✅ Handler orchestrates without touching infrastructure details
-internal sealed class CreateOrderCommandHandler(
-    IOrderRepository orderRepository,
-    IUnitOfWork unitOfWork) : ICommandHandler<CreateOrderCommand>
+internal sealed class CreateOrderCommandHandler : ICommandHandler<CreateOrderCommand>
 {
+    private readonly IOrderRepository _orderRepository;
+    private readonly IUnitOfWork _unitOfWork;
+
+    public CreateOrderCommandHandler(IOrderRepository orderRepository, IUnitOfWork unitOfWork)
+    {
+        _orderRepository = orderRepository;
+        _unitOfWork = unitOfWork;
+    }
+
     public async Task<Result> Handle(CreateOrderCommand command, CancellationToken ct)
     {
-        var order = new Order(command.CustomerId);
+        var order = Order.Create(command.CustomerId);  // ✅ static factory method
 
-        var result = order.AddItem(command.ProductId, command.Quantity);
-        if (result.IsFailure) return result;
+        order.AddItem(command.ProductId, command.Quantity);  // throws if order not in Draft status
 
-        orderRepository.Add(order);
-        await unitOfWork.SaveChangesAsync(ct);
+        await _orderRepository.AddAsync(order, ct);   // ✅ async, matches IRepository<T>
+        await _unitOfWork.SaveChangesAsync(ct);
         return Result.Success();
     }
 }
@@ -232,8 +236,7 @@ src/
 │   └── Repositories/          ← OrderRepository : IOrderRepository
 │
 └── {ProjectName}.API/
-    ├── Endpoints/             ← CreateOrderEndpoint, GetOrderEndpoint
-    ├── Extensions/            ← IEndpoint, EndpointExtensions
+    ├── Endpoints/             ← CreateOrderEndpoint, GetOrderEndpoint, IEndpoint, EndpointExtensions
     └── Middleware/            ← ExceptionHandlingMiddleware
 ```
 

@@ -41,10 +41,11 @@ src/{ProjectName}.Application/     → generates tests/{ProjectName}.Application
 
 Check what already exists:
 - Entities in `Domain/Entities/`
-- Interfaces in `Domain/Interfaces/`
-- Exceptions in `Domain/Exceptions/`
-- MediatR handlers in `Application/Features/{Entity}/Commands/` and `Application/Features/{Entity}/Queries/`
-- FluentValidation validators in `Application/Features/{Entity}/Validators/`
+- Enums in `Domain/Enums/`
+- MediatR handlers using **vertical slice** structure: `Application/{EntityPlural}/{OperationName}/`
+  - e.g., `Application/Products/CreateProduct/CreateProductCommandHandler.cs`
+  - e.g., `Application/Orders/GetOrderById/GetOrderByIdQueryHandler.cs`
+- FluentValidation validators in the same operation folder as their handler
 
 ### Step 2 — Create Test Projects
 
@@ -68,11 +69,11 @@ GetProductByIdQueryHandler.cs    →  GetProductByIdQueryHandlerTests.cs
 GetAllProductsQueryHandler.cs    →  GetAllProductsQueryHandlerTests.cs
 ```
 
-The test file lives in the same folder path as its handler, under the test project:
+The test file mirrors the vertical slice path of its handler, under the test project:
 
 ```
-src/MyShop.Application/Features/Products/Commands/CreateProductCommandHandler.cs
-tests/MyShop.Application.Tests/Features/Products/Commands/CreateProductCommandHandlerTests.cs
+src/MyShop.Application/Products/CreateProduct/CreateProductCommandHandler.cs
+tests/MyShop.Application.Tests/Products/CreateProduct/CreateProductCommandHandlerTests.cs
 ```
 
 Based on what the user asks for, generate test classes. There are two scenarios:

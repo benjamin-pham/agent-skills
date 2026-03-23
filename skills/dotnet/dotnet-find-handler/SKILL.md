@@ -23,7 +23,7 @@ code, and explain it clearly** — giving the user enough context to debug, unde
 
 ---
 
-## Step 1: Locate the project structure
+## Step 1 — Locate the project structure
 
 Find the `.sln` or `.slnx` file to identify `{ProjectName}`:
 ```
@@ -35,7 +35,7 @@ If no `.sln` found, look for an `Application` folder containing entity subfolder
 
 ---
 
-## Step 2: Find the matching handler
+## Step 2 — Find the matching handler
 
 From what the user describes (feature name, entity, action, or error symptom), locate the
 handler using one of two strategies:
@@ -90,7 +90,7 @@ If no handler is found by direct name match, do **not** give up. Work through th
 
 ---
 
-## Step 3: Read the handler and related files
+## Step 3 — Read the handler and related files
 
 Once the handler is identified, read these files **in parallel**:
 
@@ -109,7 +109,7 @@ business rules live.
 
 ---
 
-## Step 4: Present findings
+## Step 4 — Present findings
 
 Tailor the depth and focus to what the user actually needs:
 
@@ -159,7 +159,7 @@ Point out exactly which file to change for each type of modification:
 
 ---
 
-## Key principles
+## Important Reminders
 
 - **Read the actual code before explaining** — don't infer from file names alone, implementation
   often differs from what the name suggests

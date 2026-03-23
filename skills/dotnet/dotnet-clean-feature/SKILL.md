@@ -24,7 +24,7 @@ Generates individual MediatR Commands (with Handlers + Validators) and Queries (
 
 Before generating features, ensure:
 1. The entity already exists in Domain layer
-2. MediatR messaging abstractions exist (`ICommand`, `IQuery`, `ICommandHandler`, `IQueryHandler`)
+2. `ICommand`, `IQuery`, `ICommandHandler`, `IQueryHandler` exist in `Application/Abstractions/Messaging/`
 3. `Result<T>` and `Error` exist in `Domain/Abstractions/`
 4. `ISqlConnectionFactory` exists in `Application/Abstractions/Data/`
 5. `IUnitOfWork` exists in `Domain/Abstractions/`
@@ -122,7 +122,7 @@ If `README.md` is missing in an existing operation folder, create it from scratc
 
 ---
 
-## Important Conventions
+## Important Reminders
 
 Read `references/conventions.md` for the full list. Key rules:
 

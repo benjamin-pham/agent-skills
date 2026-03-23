@@ -4,10 +4,10 @@ Create all files below. Replace `{ProjectName}` with the actual project name.
 
 ---
 
-## src/{ProjectName}.Domain/Entities/BaseEntity.cs
+## src/{ProjectName}.Domain/Abstractions/BaseEntity.cs
 
 ```csharp
-namespace {ProjectName}.Domain.Entities;
+namespace {ProjectName}.Domain.Abstractions;
 
 public abstract class BaseEntity<TKey> where TKey : notnull
 {
@@ -19,7 +19,7 @@ public abstract class BaseEntity<TKey> where TKey : notnull
     public DateTime? UpdatedAt { get; set; }
     public string? UpdatedBy { get; set; }
 
-    public bool IsDeleted { get; private set; }
+    public bool IsDeleted { get; set; }
 
     protected BaseEntity()
     {
@@ -43,17 +43,23 @@ public abstract class BaseEntity : BaseEntity<Guid>
 ## src/{ProjectName}.Domain/Abstractions/IRepository.cs
 
 ```csharp
-using {ProjectName}.Domain.Entities;
-
 namespace {ProjectName}.Domain.Abstractions;
 
-public interface IRepository<T> where T : BaseEntity
+public interface IRepository<T, TKey>
+    where T : BaseEntity<TKey>
+    where TKey : notnull
 {
-    Task<T?> GetByIdAsync(Guid id, CancellationToken ct = default);
+    Task<T?> GetByIdAsync(TKey id, CancellationToken ct = default);
     Task<IReadOnlyList<T>> GetAllAsync(CancellationToken ct = default);
     Task AddAsync(T entity, CancellationToken ct = default);
     void Update(T entity);
     void Remove(T entity);
+}
+
+// Shorthand for the common case — Guid primary key
+public interface IRepository<T> : IRepository<T, Guid>
+    where T : BaseEntity
+{
 }
 ```
 
@@ -143,38 +149,47 @@ public class Result<TValue> : Result
 
 ---
 
-## src/{ProjectName}.Domain/Abstractions/ICommand.cs
+## src/{ProjectName}.Domain/Abstractions/IDateTimeProvider.cs
 
 ```csharp
-using MediatR;
-
 namespace {ProjectName}.Domain.Abstractions;
 
-public interface ICommand : IRequest<Result>
+public interface IDateTimeProvider
 {
-}
-
-public interface ICommand<TResponse> : IRequest<Result<TResponse>>
-{
+    DateTime UtcNow { get; }
 }
 ```
 
 ---
 
-## src/{ProjectName}.Domain/Abstractions/IQuery.cs
+## src/{ProjectName}.Domain/Abstractions/IUserContext.cs
 
 ```csharp
-using MediatR;
-
 namespace {ProjectName}.Domain.Abstractions;
 
-public interface IQuery<TResponse> : IRequest<Result<TResponse>>
+public interface IUserContext
 {
+    Guid UserId { get; }
 }
 ```
 
-> **Note:** ICommand and IQuery reference MediatR, so the Domain project needs a reference to
-> `{ProjectName}.Application` OR you move ICommand/IQuery into the Application layer.
-> The recommended approach: keep them in Domain and add a MediatR NuGet package to Domain
-> (`dotnet add src/{ProjectName}.Domain package MediatR`), or move them to Application.
-> Either is fine — just be consistent. The simplest option is to add MediatR to Domain.
+---
+
+## src/{ProjectName}.Domain/Abstractions/ICacheService.cs
+
+```csharp
+namespace {ProjectName}.Domain.Abstractions;
+
+public interface ICacheService
+{
+    Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default);
+
+    Task SetAsync<T>(
+        string key,
+        T value,
+        TimeSpan? expiration = null,
+        CancellationToken cancellationToken = default);
+
+    Task RemoveAsync(string key, CancellationToken cancellationToken = default);
+}
+```

@@ -62,6 +62,7 @@ Create `src/{ProjectName}.Infrastructure/Data/Configurations/{EntityName}Configu
 ```csharp
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using {ProjectName}.Domain.Abstractions;
 using {ProjectName}.Domain.Entities;
 
 namespace {ProjectName}.Infrastructure.Data.Configurations;
@@ -100,18 +101,20 @@ Always call `base.Configure(builder)` first — it maps `BaseEntity` fields.
 
 ### 2 — Repository Interface (Domain Layer)
 
-Create `src/{ProjectName}.Domain/Interfaces/I{EntityName}Repository.cs`:
+Create `src/{ProjectName}.Domain/Abstractions/I{EntityName}Repository.cs`:
 
 ```csharp
-using {ProjectName}.Domain.Entities;
+namespace {ProjectName}.Domain.Abstractions;
 
-namespace {ProjectName}.Domain.Interfaces;
-
+// Most entities use Guid key — extend IRepository<T> (shorthand)
 public interface I{EntityName}Repository : IRepository<{EntityName}>
 {
     // Add entity-specific query methods here if needed
     // Task<IReadOnlyList<{EntityName}>> GetByCategoryAsync(Guid categoryId, CancellationToken ct = default);
 }
+
+// If the entity uses a non-Guid key (e.g., int), use the generic form instead:
+// public interface I{EntityName}Repository : IRepository<{EntityName}, int> { }
 ```
 
 ### 3 — Repository Implementation
@@ -119,18 +122,22 @@ public interface I{EntityName}Repository : IRepository<{EntityName}>
 Create `src/{ProjectName}.Infrastructure/Repositories/{EntityName}Repository.cs`:
 
 ```csharp
-using Microsoft.EntityFrameworkCore;
+using {ProjectName}.Domain.Abstractions;
 using {ProjectName}.Domain.Entities;
-using {ProjectName}.Domain.Interfaces;
 using {ProjectName}.Infrastructure.Data;
 
 namespace {ProjectName}.Infrastructure.Repositories;
 
+// Most entities — Guid key, extend Repository<T> (shorthand)
 public class {EntityName}Repository(AppDbContext context)
     : Repository<{EntityName}>(context), I{EntityName}Repository
 {
     // Implement entity-specific query methods here
 }
+
+// Non-Guid key (e.g., int) — use the generic form instead:
+// public class {EntityName}Repository(AppDbContext context)
+//     : Repository<{EntityName}, int>(context), I{EntityName}Repository { }
 ```
 
 ### 4 — Register DbSet in AppDbContext
@@ -161,6 +168,7 @@ infrastructure output:
 ```csharp
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using {ProjectName}.Domain.Abstractions;
 using {ProjectName}.Domain.Entities;
 
 namespace {ProjectName}.Infrastructure.Data.Configurations;

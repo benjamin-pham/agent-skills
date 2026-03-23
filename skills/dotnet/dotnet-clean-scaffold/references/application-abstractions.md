@@ -4,11 +4,44 @@ Create all files below. Replace `{ProjectName}` with the actual project name.
 
 ---
 
-## src/{ProjectName}.Application/Abstractions/Messaging/ICommandHandler.cs
+## src/{ProjectName}.Application/Abstractions/Messaging/ICommand.cs
 
 ```csharp
 using MediatR;
 using {ProjectName}.Domain.Abstractions;
+
+namespace {ProjectName}.Application.Abstractions.Messaging;
+
+public interface ICommand : IRequest<Result>
+{
+}
+
+public interface ICommand<TResponse> : IRequest<Result<TResponse>>
+{
+}
+```
+
+---
+
+## src/{ProjectName}.Application/Abstractions/Messaging/IQuery.cs
+
+```csharp
+using MediatR;
+using {ProjectName}.Domain.Abstractions;
+
+namespace {ProjectName}.Application.Abstractions.Messaging;
+
+public interface IQuery<TResponse> : IRequest<Result<TResponse>>
+{
+}
+```
+
+---
+
+## src/{ProjectName}.Application/Abstractions/Messaging/ICommandHandler.cs
+
+```csharp
+using MediatR;
 
 namespace {ProjectName}.Application.Abstractions.Messaging;
 
@@ -29,7 +62,6 @@ public interface ICommandHandler<TCommand, TResponse> : IRequestHandler<TCommand
 
 ```csharp
 using MediatR;
-using {ProjectName}.Domain.Abstractions;
 
 namespace {ProjectName}.Application.Abstractions.Messaging;
 

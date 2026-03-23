@@ -8,7 +8,6 @@ description: >
   the user wants to add log lines, log a request/response, add logging to a
   service or handler, debug with logs — including Vietnamese like "thêm logging",
   "ghi log cho service", "log request response", "thêm log vào controller".
-  Do NOT trigger for Serilog infrastructure setup (that is dotnet-clean-serilog).
 ---
 
 # Structured Logging with ILogger\<T>
@@ -174,7 +173,7 @@ Follow this guide based on what the user asks:
 | **Infrastructure** | External calls (API, DB, cache), retries, fallbacks | Information / Warning / Error |
 | **Middleware** | Cross-cutting: auth failures, rate limiting, unhandled exceptions | Warning / Error |
 
-## Important Notes
+## Important Reminders
 
 - The project MUST already have Serilog configured. This skill only adds log statements to existing code.
 - **Never log sensitive data**: passwords, tokens, credit card numbers, PII. If the DTO contains sensitive fields, log only safe properties or create a sanitized projection.

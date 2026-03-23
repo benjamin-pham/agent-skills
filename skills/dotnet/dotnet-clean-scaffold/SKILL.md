@@ -24,8 +24,8 @@ Uses real `dotnet` CLI commands — no manual file creation needed.
 | File | Contents |
 |------|----------|
 | `references/msbuild-props.md` | Directory.Build.props, Directory.Packages.props, cleaned .csproj templates |
-| `references/domain-abstractions.md` | BaseEntity, IRepository, IUnitOfWork, Result, Error, ICommand, IQuery |
-| `references/application-abstractions.md` | ICommandHandler, IQueryHandler, ISqlConnectionFactory, ValidationBehavior, DI |
+| `references/domain-abstractions.md` | BaseEntity, IRepository, IUnitOfWork, Result, Error |
+| `references/application-abstractions.md` | ICommand, IQuery, ICommandHandler, IQueryHandler, ISqlConnectionFactory, ValidationBehavior, DI |
 | `references/infrastructure-foundation.md` | AppDbContext, BaseEntityConfiguration, Repository\<T\>, SqlConnectionFactory, DI |
 | `references/api-foundation.md` | IEndpoint, EndpointExtensions, Program.cs, appsettings.json |
 
@@ -196,7 +196,7 @@ Once the scaffold is complete, the following skills work immediately:
 
 ---
 
-## Important notes
+## Important Reminders
 
 - Target **.NET 10** (`net10.0`) and **C# 13** throughout.
 - Use **file-scoped namespaces** everywhere (`namespace Foo.Bar;` not `namespace Foo.Bar { }`).

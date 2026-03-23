@@ -12,11 +12,15 @@ without knowing about EF Core directly.
 
 ```csharp
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using {ProjectName}.Domain.Abstractions;
 
 namespace {ProjectName}.Infrastructure.Data;
 
-public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
+public sealed class AppDbContext(
+    DbContextOptions<AppDbContext> options,
+    IDateTimeProvider dateTimeProvider,
+    IUserContext userContext)
     : DbContext(options), IUnitOfWork
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -27,6 +31,27 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
 
     public override async Task<int> SaveChangesAsync(CancellationToken ct = default)
     {
+        var now = dateTimeProvider.UtcNow;
+        string? userId = null;
+
+        try { userId = userContext.UserId.ToString(); }
+        catch { /* outside of HTTP request (migrations, seeding) */ }
+
+        foreach (var entry in ChangeTracker.Entries<BaseEntity>())
+        {
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    entry.Entity.CreatedAt = now;
+                    entry.Entity.CreatedBy = userId;
+                    break;
+                case EntityState.Modified:
+                    entry.Entity.UpdatedAt = now;
+                    entry.Entity.UpdatedBy = userId;
+                    break;
+            }
+        }
+
         return await base.SaveChangesAsync(ct);
     }
 }
@@ -39,15 +64,21 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
 All entity-specific configurations extend this class. It maps the `BaseEntity`
 audit fields to snake_case columns and configures the soft-delete query filter.
 
+There are two versions:
+- `BaseEntityConfiguration<T>` — shorthand for the common case (Guid key)
+- `BaseEntityConfiguration<T, TKey>` — generic version for entities with non-Guid keys (e.g., `int`, `long`)
+
 ```csharp
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using {ProjectName}.Domain.Entities;
+using {ProjectName}.Domain.Abstractions;
 
 namespace {ProjectName}.Infrastructure.Data.Configurations;
 
-public abstract class BaseEntityConfiguration<T> : IEntityTypeConfiguration<T>
-    where T : BaseEntity
+// Generic version — use when the entity has a non-Guid primary key
+public abstract class BaseEntityConfiguration<T, TKey> : IEntityTypeConfiguration<T>
+    where T : BaseEntity<TKey>
+    where TKey : notnull
 {
     public virtual void Configure(EntityTypeBuilder<T> builder)
     {
@@ -78,6 +109,12 @@ public abstract class BaseEntityConfiguration<T> : IEntityTypeConfiguration<T>
         builder.HasQueryFilter(x => !x.IsDeleted);
     }
 }
+
+// Shorthand for the common case — Guid primary key
+public abstract class BaseEntityConfiguration<T> : BaseEntityConfiguration<T, Guid>
+    where T : BaseEntity
+{
+}
 ```
 
 ---
@@ -89,18 +126,18 @@ Generic repository implementation. Entity-specific repositories inherit from thi
 ```csharp
 using Microsoft.EntityFrameworkCore;
 using {ProjectName}.Domain.Abstractions;
-using {ProjectName}.Domain.Entities;
 using {ProjectName}.Infrastructure.Data;
 
 namespace {ProjectName}.Infrastructure.Repositories;
 
-public abstract class Repository<T>(AppDbContext context) : IRepository<T>
-    where T : BaseEntity
+public abstract class Repository<T, TKey>(AppDbContext context) : IRepository<T, TKey>
+    where T : BaseEntity<TKey>
+    where TKey : notnull
 {
     protected readonly AppDbContext Context = context;
 
-    public async Task<T?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
-        await Context.Set<T>().FirstOrDefaultAsync(x => x.Id == id, ct);
+    public async Task<T?> GetByIdAsync(TKey id, CancellationToken ct = default) =>
+        await Context.Set<T>().FindAsync([id!], ct);
 
     public async Task<IReadOnlyList<T>> GetAllAsync(CancellationToken ct = default) =>
         await Context.Set<T>().ToListAsync(ct);
@@ -113,6 +150,12 @@ public abstract class Repository<T>(AppDbContext context) : IRepository<T>
 
     public void Remove(T entity) =>
         Context.Set<T>().Remove(entity);
+}
+
+// Shorthand for the common case — Guid primary key
+public abstract class Repository<T>(AppDbContext context) : Repository<T, Guid>(context)
+    where T : BaseEntity
+{
 }
 ```
 
@@ -146,14 +189,135 @@ internal sealed class SqlConnectionFactory(string connectionString) : ISqlConnec
 
 ---
 
+## src/{ProjectName}.Infrastructure/Clock/DateTimeProvider.cs
+
+```csharp
+using {ProjectName}.Domain.Abstractions;
+
+namespace {ProjectName}.Infrastructure.Clock;
+
+internal sealed class DateTimeProvider : IDateTimeProvider
+{
+    public DateTime UtcNow => DateTime.UtcNow;
+}
+```
+
+---
+
+## src/{ProjectName}.Infrastructure/Caching/CacheService.cs
+
+```csharp
+using System.Buffers;
+using System.Text.Json;
+using Microsoft.Extensions.Caching.Distributed;
+using {ProjectName}.Domain.Abstractions;
+
+namespace {ProjectName}.Infrastructure.Caching;
+
+internal sealed class CacheService(IDistributedCache distributedCache) : ICacheService
+{
+    public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
+    {
+        byte[]? bytes = await distributedCache.GetAsync(key, cancellationToken);
+
+        return bytes is null ? default : Deserialize<T>(bytes);
+    }
+
+    public Task SetAsync<T>(
+        string key,
+        T value,
+        TimeSpan? expiration = null,
+        CancellationToken cancellationToken = default)
+    {
+        byte[] bytes = Serialize(value);
+
+        return distributedCache.SetAsync(key, bytes, CacheOptions.Create(expiration), cancellationToken);
+    }
+
+    public Task RemoveAsync(string key, CancellationToken cancellationToken = default) =>
+        distributedCache.RemoveAsync(key, cancellationToken);
+
+    private static T Deserialize<T>(byte[] bytes) =>
+        JsonSerializer.Deserialize<T>(bytes)!;
+
+    private static byte[] Serialize<T>(T value)
+    {
+        ArrayBufferWriter<byte> buffer = new();
+
+        using Utf8JsonWriter writer = new(buffer);
+
+        JsonSerializer.Serialize(writer, value);
+
+        return buffer.WrittenSpan.ToArray();
+    }
+}
+```
+
+---
+
+## src/{ProjectName}.Infrastructure/Caching/CacheOptions.cs
+
+```csharp
+using Microsoft.Extensions.Caching.Distributed;
+
+namespace {ProjectName}.Infrastructure.Caching;
+
+internal static class CacheOptions
+{
+    public static DistributedCacheEntryOptions Create(TimeSpan? expiration) =>
+        expiration is null
+            ? new DistributedCacheEntryOptions()
+            : new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = expiration };
+}
+```
+
+---
+
+## src/{ProjectName}.Infrastructure/Authentication/UserContext.cs
+
+```csharp
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using {ProjectName}.Domain.Abstractions;
+
+namespace {ProjectName}.Infrastructure.Authentication;
+
+internal sealed class UserContext(IHttpContextAccessor contextAccessor) : IUserContext
+{
+    public Guid UserId =>
+        contextAccessor
+            .HttpContext?.User
+            .GetUserId() ?? throw new ApplicationException("User context is unavailable");
+}
+
+internal static class ClaimsPrincipalExtensions
+{
+    public static Guid GetUserId(this ClaimsPrincipal principal)
+    {
+        string? userId = principal?.FindFirstValue(JwtRegisteredClaimNames.Sub);
+
+        return Guid.TryParse(userId, out Guid parsedUserId)
+            ? parsedUserId
+            : throw new ApplicationException("User identifier is unavailable");
+    }
+}
+```
+
+---
+
 ## src/{ProjectName}.Infrastructure/DependencyInjection.cs
 
 ```csharp
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using {ProjectName}.Application.Abstractions.Data;
 using {ProjectName}.Domain.Abstractions;
+using {ProjectName}.Infrastructure.Authentication;
+using {ProjectName}.Infrastructure.Caching;
+using {ProjectName}.Infrastructure.Clock;
 using {ProjectName}.Infrastructure.Data;
 
 namespace {ProjectName}.Infrastructure;
@@ -174,6 +338,13 @@ public static class DependencyInjection
 
         services.AddSingleton<ISqlConnectionFactory>(
             _ => new SqlConnectionFactory(connectionString));
+
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+
+        services.AddHttpContextAccessor();
+        services.AddScoped<IUserContext, UserContext>();
+
+        services.AddScoped<ICacheService, CacheService>();
 
         return services;
     }

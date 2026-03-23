@@ -75,7 +75,7 @@ If DTOs are shared across multiple endpoints (e.g., a `ProductResponse` used by 
 3. Verify `Program.cs` calls `app.MapEndpoints()`
 4. Run `dotnet build` to confirm compilation
 
-## Important Notes
+## Important Reminders
 
 - **One class = one operation.** Don't put multiple MapGet/MapPost in one class. The whole point is separation.
 - **Delegate parameters for DI.** The endpoint class is instantiated once at startup for registration. Runtime dependencies (repos, services) go in the lambda parameters inside `MapEndpoint`, where the DI container resolves them per-request.
@@ -83,3 +83,4 @@ If DTOs are shared across multiple endpoints (e.g., a `ProductResponse` used by 
 - **OpenAPI metadata**: use `.WithName()`, `.WithTags()`, `.Produces<T>()` to enrich Scalar/OpenAPI docs.
 - **Soft delete**: the Delete endpoint sets `IsDeleted = true` via the repository, not a hard delete.
 - Target **.NET 10** with **C# 13** features (file-scoped namespaces, primary constructors).
+- If user provides entity name in Vietnamese, translate to English PascalCase and confirm with the user.
