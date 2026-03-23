@@ -1,0 +1,23 @@
+{
+  "skill_name": "dotnet-clean-unit-test",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Tôi có dự án MyShop clean architecture với entity Product (Name, Price, Description, CategoryId) và Category (Name). Có CQRS handler cho Product: GetAllProductsQuery, GetProductByIdQuery, CreateProductCommand, UpdateProductCommand, DeleteProductCommand. Có CreateProductCommandValidator validate Name not empty và Price > 0. Tạo unit test project cho tôi.",
+      "expected_output": "Creates Domain.Tests and Application.Tests projects with correct packages, generates entity tests for Product and Category, handler tests for all 5 CQRS handlers, and validator tests for CreateProductCommandValidator. All tests follow AAA pattern with NSubstitute and FluentAssertions.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Viết unit test cho CreateProductCommandHandler trong dự án ECommerce. Handler nhận CreateProductCommand(Name, Description, Price, CategoryId), dùng IProductRepository để tạo product và trả về Guid. Nếu CategoryId không tồn tại thì throw NotFoundException.",
+      "expected_output": "Generates CreateProductCommandHandlerTests.cs with tests for: happy path (valid command creates product and returns Guid), category not found (throws NotFoundException), repository interaction verification (Received/DidNotReceive). Uses NSubstitute mocks for IProductRepository and ICategoryRepository.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Viết unit test cho entity Order (có method Confirm(), Cancel(), AddItem(OrderItem item), property TotalAmount tự động tính từ Items) và CreateOrderCommandValidator (validate CustomerName not empty, Items not empty, each item Quantity > 0) trong dự án OrderSystem.",
+      "expected_output": "Generates OrderTests.cs testing domain logic: Confirm/Cancel state transitions, AddItem behavior, TotalAmount calculation, invalid state exceptions. Generates CreateOrderCommandValidatorTests.cs testing each validation rule with valid and invalid inputs using Theory/InlineData.",
+      "files": []
+    }
+  ]
+}

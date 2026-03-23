@@ -1,0 +1,20 @@
+{
+  "skill_name": "dotnet-clean-architect",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Đây là class Order của tôi, review xem có vấn đề gì không:\n\n```csharp\npublic class Order\n{\n    public int Id { get; set; }\n    public List<OrderItem> Items { get; set; } = new();\n    public string Status { get; set; } = \"Draft\";\n    public decimal TotalAmount { get; set; }\n}\n\npublic class OrderService\n{\n    private readonly AppDbContext _db;\n    public OrderService(AppDbContext db) { _db = db; }\n\n    public async Task SubmitOrder(int orderId)\n    {\n        var order = await _db.Orders.Include(o => o.Items).FirstAsync(o => o.Id == orderId);\n        if (!order.Items.Any()) throw new Exception(\"Order is empty\");\n        order.Status = \"Submitted\";\n        order.TotalAmount = order.Items.Sum(i => i.Price * i.Quantity);\n        await _db.SaveChangesAsync();\n    }\n}\n```",
+      "expected_output": "Phát hiện 3 vấn đề: (1) anemic domain model - entity Order không có behavior, (2) OrderService inject DbContext trực tiếp thay vì IRepository, (3) business logic nằm trong service thay vì entity. Đề xuất cụ thể: chuyển Submit() vào Order entity, tính TotalAmount trong entity, thay AppDbContext bằng IOrderRepository."
+    },
+    {
+      "id": 2,
+      "prompt": "Tôi có một IEmailService dùng để gửi email xác nhận đơn hàng sau khi submit. Tôi nên đặt interface này ở đâu và implement ở đâu?",
+      "expected_output": "Interface IEmailService đặt ở Application layer (Abstractions/), implementation EmailService đặt ở Infrastructure layer. Giải thích tại sao: Application chỉ biết 'cần gửi email' (interface), Infrastructure biết 'gửi qua SMTP/SendGrid' (implementation). Domain không cần biết gì về email."
+    },
+    {
+      "id": 3,
+      "prompt": "Tôi đang tổ chức Application layer như này, có ổn không?\n\n```\nApplication/\n  Services/\n    OrderService.cs\n    CustomerService.cs\n    ProductService.cs\n  DTOs/\n    OrderDto.cs\n    CustomerDto.cs\n```",
+      "expected_output": "Cấu trúc này thiếu CQRS pattern. Đề xuất tổ chức theo feature folder với Commands/Queries thay vì Services. Ví dụ cụ thể: Application/Orders/CreateOrder/CreateOrderCommand.cs, CreateOrderCommandHandler.cs, v.v. Giải thích lợi ích của feature-based organization."
+    }
+  ]
+}

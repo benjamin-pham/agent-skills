@@ -1,0 +1,23 @@
+{
+  "skill_name": "dotnet-clean-integration-test",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Tôi có dự án MyShop clean architecture với entity Product (Name, Price, Description, CategoryId) và Category (Name). Có CQRS handlers cho Product: GetAllProducts, GetProductById, CreateProduct, UpdateProduct, DeleteProduct. Endpoints dùng minimal API có require JWT auth cho POST/PUT/DELETE. Tạo integration test project cho tôi.",
+      "expected_output": "Creates IntegrationTests project with correct packages (Testcontainers.PostgreSql, Respawn, Microsoft.AspNetCore.Mvc.Testing), sets up CustomWebApplicationFactory with PostgreSQL container and Respawn, creates IntegrationTestBase with SeedAsync/AuthenticateAs/GetFromDbAsync helpers, JwtTokenHelper, and generates ProductsEndpointTests with tests for all 5 endpoints including auth guards.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Viết integration test cho ProductRepository trong dự án ECommerce. Repository có method GetByNameAsync(string name) và GetByCategoryIdAsync(Guid categoryId) ngoài CRUD cơ bản. Entity Product có CategoryId là foreign key tới Category.",
+      "expected_output": "Generates ProductRepositoryTests.cs with tests for: GetByIdAsync (found/not found), GetAllAsync (with data/empty), GetByNameAsync (match/no match), GetByCategoryIdAsync (returns correct products), navigation property loading. Uses SeedAsync to prepare data, GetService<IProductRepository> to resolve the real implementation.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Dự án OrderSystem đã có integration test project rồi (CustomWebApplicationFactory, IntegrationTestBase đã setup). Giờ tôi muốn viết integration test cho Orders endpoint: GET /api/orders (chỉ trả orders của user hiện tại), POST /api/orders (tạo order với list OrderItems), và DELETE /api/orders/{id} (chỉ admin mới xóa được). Order có OrderItems là list navigation property.",
+      "expected_output": "Generates OrdersEndpointTests.cs that: (1) GET tests seed orders for multiple users and verify only current user's orders returned, (2) POST tests create order with items and verify DB persistence including nested OrderItems, (3) DELETE tests verify admin-only access, 404 for non-existing, and confirms removal from DB. Uses AuthenticateAs for JWT, seeds nested data correctly.",
+      "files": []
+    }
+  ]
+}
