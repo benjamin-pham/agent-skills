@@ -12,8 +12,11 @@ description: >
   "thêm use case", "create feature for Product", "sinh command CreateProduct",
   "add GetAll query", "tạo handler", or any Vietnamese/English request about adding
   MediatR commands, queries, handlers, validators, or application-layer features.
-  Also trigger when user says "tạo API cho entity X" — this skill handles the Application
-  layer.
+  Also trigger as part of "tạo API cho entity X" — this skill handles the Application layer
+  (pair with dotnet-clean-endpoint for the API layer).
+metadata:
+  related-skills:
+    - dotnet-clean-architect
 ---
 
 # ASP.NET Core — Clean Architecture Command & Query Generator (MediatR CQRS)
@@ -46,13 +49,14 @@ Features are organized by entity, then by operation:
 
 ```
 src/{ProjectName}.Application/
-  {EntityPlural}/                          # e.g., Bookings/
-    {OperationName}/                       # e.g., ReserveBooking/
-      README.md                            # Business documentation
-      {OperationName}Command.cs            # or {OperationName}Query.cs
-      {OperationName}CommandHandler.cs     # or {OperationName}QueryHandler.cs
-      {OperationName}CommandValidator.cs   # Commands only
-      {OperationName}Response.cs           # if operation returns a DTO
+  Features/
+    {EntityPlural}/                          # e.g., Bookings/
+      {OperationName}/                       # e.g., ReserveBooking/
+        README.md                            # Business documentation
+        {OperationName}Command.cs            # or {OperationName}Query.cs
+        {OperationName}CommandHandler.cs     # or {OperationName}QueryHandler.cs
+        {OperationName}CommandValidator.cs   # Commands only
+        {OperationName}Response.cs           # if operation returns a DTO
 ```
 
 **Naming rules:**
@@ -61,7 +65,7 @@ src/{ProjectName}.Application/
 - Queries: `{Verb}{Entity}Query` (e.g., `GetBookingQuery`, `SearchApartmentsQuery`)
 - Use **domain language** — prefer `Reserve` over `Create`, `Search` over `GetAll` when it fits the domain
 
-**Simple features** (single query, no commands): files can sit directly in `{EntityPlural}/` without operation subfolder, matching the Apartments pattern in the reference project.
+**Simple features** (single query, no commands): files can sit directly in `Features/{EntityPlural}/` without operation subfolder, matching the Apartments pattern in the reference project.
 
 ---
 

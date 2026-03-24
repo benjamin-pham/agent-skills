@@ -11,6 +11,13 @@ description: >
   "tạo project từ đầu", "bootstrap .NET", "setup project", "tạo project X" — even if the user
   just names the project without saying "scaffold". Always use this skill before any other
   dotnet-clean-* skill when no solution file exists yet.
+metadata:
+  related-skills:
+    - dotnet-clean-entity
+    - dotnet-clean-repository
+    - dotnet-clean-feature
+    - dotnet-clean-endpoint
+    - dotnet-clean-architect
 ---
 
 # .NET 10 Clean Architecture — Project Scaffolder
@@ -133,6 +140,7 @@ src/{ProjectName}.Application/
     Data/
     Messaging/
   Behaviors/
+  Features/
 
 src/{ProjectName}.Infrastructure/
   Data/

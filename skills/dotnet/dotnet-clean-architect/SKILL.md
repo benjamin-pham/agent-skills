@@ -185,7 +185,7 @@ public class CreateOrderEndpoint : IEndpoint
 | `DbContext` injected directly into a handler | Application | Inject `IRepository<T>` or `IUnitOfWork` instead |
 | Business logic (`if/else`, calculations) inside an endpoint | API | Move to entity method or handler |
 | `HttpClient` / external SDK in Domain entity | Domain | Define interface in Application, implement in Infrastructure |
-| Entity with all public `{ get; set; }` and no methods | Domain | Add behavior methods, make setters private |
+| Entity with all public `{ get; set; }` and no methods | Domain | Add behavior methods that enforce business rules — the entity controls its own state |
 | Service class that sets entity properties from outside | Application | Push logic down into the entity itself |
 | DTO from API request passed directly into Domain | Domain | Map to a Command in Application layer |
 | `IRepository` implemented inside Application project | Application | Move implementation to Infrastructure |
@@ -222,12 +222,13 @@ src/
 │   │   ├── Data/              ← ISqlConnectionFactory
 │   │   └── Messaging/         ← ICommand, IQuery, ICommandHandler, IQueryHandler
 │   ├── Behaviors/             ← ValidationBehavior, LoggingBehavior
-│   └── Orders/                ← Feature folder per aggregate
-│       └── CreateOrder/
-│           ├── CreateOrderCommand.cs
-│           ├── CreateOrderCommandHandler.cs
-│           ├── CreateOrderCommandValidator.cs
-│           └── OrderResponse.cs
+│   └── Features/
+│       └── Orders/                ← Feature folder per aggregate
+│           └── CreateOrder/
+│               ├── CreateOrderCommand.cs
+│               ├── CreateOrderCommandHandler.cs
+│               ├── CreateOrderCommandValidator.cs
+│               └── OrderResponse.cs
 │
 ├── {ProjectName}.Infrastructure/
 │   ├── Data/
@@ -241,11 +242,3 @@ src/
 ```
 
 ---
-
-## Related skills
-
-- **dotnet-clean-scaffold** — create a new Clean Architecture solution from scratch
-- **dotnet-clean-entity** — add a domain entity with rich model patterns
-- **dotnet-clean-feature** — add a CQRS command or query + handler
-- **dotnet-clean-repository** — add EF Core configuration + repository for an entity
-- **dotnet-clean-endpoint** — add a Minimal API endpoint

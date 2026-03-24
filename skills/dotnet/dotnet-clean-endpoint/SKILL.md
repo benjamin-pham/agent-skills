@@ -9,6 +9,9 @@ description: >
   add CRUD for an entity, or wire up a new route — including Vietnamese like
   "tạo endpoint", "thêm API cho entity", "tạo CRUD", "thêm route".
   Do NOT trigger for Serilog setup, entity generation, or project scaffolding.
+metadata:
+  related-skills:
+    - dotnet-clean-architect
 ---
 
 # Minimal API Endpoints — Class-per-Endpoint Pattern

@@ -10,6 +10,9 @@ description: >
   "tạo configuration", "add DbSet", "setup persistence", "cấu hình EF Core",
   or any Vietnamese/English request about EF Core configuration, repository
   pattern, or database mapping in a .NET clean architecture project.
+metadata:
+  related-skills:
+    - dotnet-clean-architect
 ---
 
 # ASP.NET Core — EF Core & Repository Generator

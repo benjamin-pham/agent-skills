@@ -11,6 +11,9 @@ description: >
   in a .NET clean architecture project — including Vietnamese like
   "tạo unit test", "viết test", "thêm test cho entity", "tạo test project".
   Do NOT trigger for integration tests, API tests, or WebApplicationFactory-based tests.
+metadata:
+  related-skills:
+    - dotnet-clean-architect
 ---
 
 # ASP.NET Core — Clean Architecture Unit Test Generator
@@ -42,9 +45,9 @@ src/{ProjectName}.Application/     → generates tests/{ProjectName}.Application
 Check what already exists:
 - Entities in `Domain/Entities/`
 - Enums in `Domain/Enums/`
-- MediatR handlers using **vertical slice** structure: `Application/{EntityPlural}/{OperationName}/`
-  - e.g., `Application/Products/CreateProduct/CreateProductCommandHandler.cs`
-  - e.g., `Application/Orders/GetOrderById/GetOrderByIdQueryHandler.cs`
+- MediatR handlers using **vertical slice** structure: `Application/Features/{EntityPlural}/{OperationName}/`
+  - e.g., `Application/Features/Products/CreateProduct/CreateProductCommandHandler.cs`
+  - e.g., `Application/Features/Orders/GetOrderById/GetOrderByIdQueryHandler.cs`
 - FluentValidation validators in the same operation folder as their handler
 
 ### Step 2 — Create Test Projects
@@ -72,8 +75,8 @@ GetAllProductsQueryHandler.cs    →  GetAllProductsQueryHandlerTests.cs
 The test file mirrors the vertical slice path of its handler, under the test project:
 
 ```
-src/MyShop.Application/Products/CreateProduct/CreateProductCommandHandler.cs
-tests/MyShop.Application.Tests/Products/CreateProduct/CreateProductCommandHandlerTests.cs
+src/MyShop.Application/Features/Products/CreateProduct/CreateProductCommandHandler.cs
+tests/MyShop.Application.Tests/Features/Products/CreateProduct/CreateProductCommandHandlerTests.cs
 ```
 
 Based on what the user asks for, generate test classes. There are two scenarios:

@@ -14,6 +14,10 @@ description: >
   about tracing, understanding, or fixing a named feature in a CQRS project.
   Always use this skill before anything else when the user names a specific feature or use case
   and asks why it's broken, how it works, or wants to modify it.
+metadata:
+  related-skills: 
+    - dotnet-clean-architect
+    - dotnet-clean-feature
 ---
 
 # dotnet-find-handler — CQRS Handler Finder & Explainer
@@ -27,11 +31,10 @@ code, and explain it clearly** — giving the user enough context to debug, unde
 
 Find the `.sln` or `.slnx` file to identify `{ProjectName}`:
 ```
-src/{ProjectName}.Application/   ← All handlers live here
+src/{ProjectName}.Application/Features/{EntityPlural}/{OperationName}/   ← All handlers live here
 ```
 
-If no `.sln` found, look for an `Application` folder containing entity subfolders
-(e.g., `Bookings/`, `Orders/`, `Users/`).
+If no `.sln` found, look for an `Application/Features/` folder with entity subfolders inside (e.g., `Features/Bookings/`, `Features/Orders/`, `Features/Users/`).
 
 ---
 
@@ -43,12 +46,12 @@ handler using one of two strategies:
 ### Strategy A — User names a specific handler / command / query
 If the user mentions a specific name (`ReserveBooking`, `CreateOrder`, `GetBookings`):
 - Search for `*CommandHandler.cs` or `*QueryHandler.cs` matching that name
-- Look inside `src/**/{FeatureName}/` first
+- Look inside `src/{ProjectName}.Application/Features/{EntityPlural}/{OperationName}/` first
 
 ### Strategy B — User only describes the feature or entity
 If the user says something like "the booking feature" or "the payment use case":
 1. Infer the entity involved (`Booking`, `Payment`, `Order`, `User`...)
-2. Find the entity folder in the Application layer: `src/**/{EntityPlural}/`
+2. Find the entity folder: `src/{ProjectName}.Application/Features/{EntityPlural}/`
 3. List all handlers in that folder, then either ask the user to pick, or infer the best
    match from context
 
@@ -57,11 +60,11 @@ If the user says something like "the booking feature" or "the payment use case":
 If no handler is found by direct name match, do **not** give up. Work through these steps:
 
 1. **Scan all handler files** — list every `*CommandHandler.cs` and `*QueryHandler.cs` in the
-   Application layer. Read their file names and folder names to build a mental map of what exists.
+   `Application/` folder. Read their file names and folder names to build a mental map of what exists.
 
-2. **Read README.md files** — each feature folder contains a `README.md` with business
-   descriptions in natural language (possibly in Vietnamese). Search README files for keywords
-   that match what the user described.
+2. **Read README.md files** — each operation folder inside `Application/Features/{EntityPlural}/` contains a `README.md`
+   with business descriptions in natural language (possibly in Vietnamese). Search README files
+   for keywords that match what the user described.
 
 3. **Match by intent** — use semantic reasoning:
    - "đặt phòng" → look for `Reserve`, `Book`, `Create` in `Bookings/`
@@ -171,9 +174,3 @@ Point out exactly which file to change for each type of modification:
   or folder path
 
 ---
-
-## Related skills
-
-- **dotnet-clean-feature** — scaffold a new Command/Query + Handler
-- **dotnet-clean-architect** — review layer violations in existing code
-- **dotnet-clean-endpoint** — find the Minimal API endpoint that calls this handler

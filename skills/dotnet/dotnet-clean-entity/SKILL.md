@@ -10,6 +10,9 @@ description: >
   "thêm domain object", or any request about domain entities with factory
   methods or encapsulation. Even if user just says "tạo entity X", use this
   skill — all entities follow rich domain model by default.
+metadata:
+  related-skills:
+    - dotnet-clean-architect
 ---
 
 # ASP.NET Core — Rich Domain Entity Generator

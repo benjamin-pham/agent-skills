@@ -11,6 +11,9 @@ description: >
   — including Vietnamese like "tạo integration test", "viết integration test", "test endpoint API",
   "test repository với database thật", "thêm integration test project", "test toàn bộ luồng".
   Do NOT trigger for unit tests (no DB, no HTTP), which belong in the dotnet-clean-unit-test skill.
+metadata:
+  related-skills:
+    - dotnet-clean-architect
 ---
 
 # ASP.NET Core — Clean Architecture Integration Test Generator
