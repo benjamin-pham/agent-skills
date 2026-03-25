@@ -1,0 +1,23 @@
+{
+  "skill_name": "dotnet-clean-scaffold",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "tạo project mới tên là Bookings, dùng PostgreSQL, output directory là /tmp/scaffold-test/bookings",
+      "expected_output": "Complete Clean Architecture solution with 4 source projects (Domain, Application, Infrastructure, API), 5 test projects, Directory.Build.props, Directory.Packages.props, .slnx file, and all base abstractions. dotnet build and dotnet test should pass.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Create a new Clean Architecture project called EcommerceApi using SQL Server. Put it in /tmp/scaffold-test/ecommerce",
+      "expected_output": "Complete Clean Architecture solution using SQL Server (Microsoft.EntityFrameworkCore.SqlServer instead of Npgsql). All 4 source layers and 5 test projects created. Should use SqlServer in DbContext configuration. Build must pass.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "tạo solution TaskManager ở /tmp/scaffold-test/taskmgr, dùng PostgreSQL",
+      "expected_output": "Complete Clean Architecture solution named TaskManager. All structure correct. .slnx file present. All abstractions (BaseEntity, IRepository, IUnitOfWork, Result, Error, ICommand, IQuery, etc.) created. Architecture tests pass.",
+      "files": []
+    }
+  ]
+}

@@ -165,8 +165,6 @@ With CPM enabled, remove the `Version` attribute:
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Serilog.AspNetCore" />
-    <PackageReference Include="Serilog.Sinks.Console" />
-    <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Scalar.AspNetCore" />
   </ItemGroup>
 
