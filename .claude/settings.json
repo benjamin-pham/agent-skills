@@ -1,18 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ls -1d /home/manpm/projects/newskills/skills/dotnet/*/)",
-      "Bash(done)",
-      "Bash(dotnet *)",
-      "Bash(mkdir *)",
-      "Bash(rm *)",
-      "Bash(find *)",
-      "Bash(cp *)",
-      "Bash(cat *)",
-      "Read(//home/manpm/**)",
-      "Read(//usr/**)",
-      "Read(//opt/**)",
-      "Read(//home/manpm/projects/newskills/**)"
+      "Bash",
+      "WebFetch",
+      "WebSearch",
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "Agent",
+      "TodoWrite"
+    ],
+    "ask": [
+      "Bash(rm:*)",
+      "Bash(sudo:*)"
     ],
     "additionalDirectories": [
       "/tmp"
