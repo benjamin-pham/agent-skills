@@ -2,7 +2,20 @@
   "permissions": {
     "allow": [
       "Bash(ls -1d /home/manpm/projects/newskills/skills/dotnet/*/)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(dotnet *)",
+      "Bash(mkdir *)",
+      "Bash(rm *)",
+      "Bash(find *)",
+      "Bash(cp *)",
+      "Bash(cat *)",
+      "Read(//home/manpm/**)",
+      "Read(//usr/**)",
+      "Read(//opt/**)",
+      "Read(//home/manpm/projects/newskills/**)"
+    ],
+    "additionalDirectories": [
+      "/tmp"
     ]
   }
 }

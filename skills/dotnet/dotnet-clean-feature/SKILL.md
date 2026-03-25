@@ -17,6 +17,9 @@ description: >
 metadata:
   related-skills:
     - dotnet-clean-architect
+    - dotnet-clean-endpoint
+    - dotnet-clean-entity
+    - dotnet-clean-repository
 ---
 
 # ASP.NET Core — Clean Architecture Command & Query Generator (MediatR CQRS)
@@ -138,7 +141,8 @@ Read `references/conventions.md` for the full list. Key rules:
 - Handlers use **explicit constructor + private readonly fields** (not primary constructors)
 - Commands go through **Repository + UnitOfWork** (write side)
 - Queries go through **Dapper + ISqlConnectionFactory** (read side) — this is CQRS
-- All SQL uses **snake_case** column names with PascalCase aliases
+- All SQL uses **snake_case** column names with PascalCase aliases — see `dotnet-clean-repository/references/snake_case_rules.md` for the complete naming rules
 - **No AutoMapper/Mapster** — Dapper maps directly to Response DTOs via SQL aliases
 - Validators only on **Commands** (not queries)
+- **CancellationToken** — every `Handle` method signature must include `CancellationToken cancellationToken`, and pass it down to every async call (`GetByIdAsync`, `SaveChangesAsync`, Dapper queries, etc.)
 - When user provides operation names in Vietnamese, translate to English PascalCase and confirm

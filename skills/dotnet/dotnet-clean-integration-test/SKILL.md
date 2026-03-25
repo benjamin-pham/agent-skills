@@ -252,6 +252,7 @@ deleted.Should().BeNull();
 - `CustomWebApplicationFactory` is shared across all tests in a class via `IClassFixture` — **never modify** it inside a test
 - Respawn resets data between tests, but the Docker container stays alive for the full test run — this is intentional and fast
 - Always verify DB state after mutations (POST/PUT/DELETE) — don't just check the HTTP status
+- **CancellationToken** — pass `CancellationToken.None` or the test framework's token to all async repository and handler calls in test helpers; most integration test HTTP calls are already covered by `HttpClient` timeout
 - If the project uses SQL Server instead of PostgreSQL, swap `Testcontainers.PostgreSql` for `Testcontainers.MsSql` in `test-project-setup.md` and update the container builder in `webappfactory-setup.md`
 - If user provides entity or feature name in Vietnamese, translate to English PascalCase and confirm
 

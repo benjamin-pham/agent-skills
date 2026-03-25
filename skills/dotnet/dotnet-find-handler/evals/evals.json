@@ -6,7 +6,7 @@
       "prompt": "Tôi muốn hiểu flow của ReserveBooking hoạt động như thế nào. Giải thích cho tôi từ đầu đến cuối, kể cả validation và business rules.",
       "expected_output": "Skill tìm đúng ReserveBookingCommandHandler trong Features/Bookings/ReserveBooking/, đọc README.md, Command, Handler, và Validator, sau đó giải thích đầy đủ: input, validation rules, execution flow (fetch user → fetch apartment → check overlap → reserve → save), và các error cases.",
       "files": [
-        "/home/manpham/projects/agent-skills/skills/dotnet/dotnet-find-handler-workspace/fake-project"
+        "/home/manpm/projects/newskills/skills/dotnet/dotnet-find-handler-workspace/fake-project"
       ]
     },
     {
@@ -14,7 +14,7 @@
       "prompt": "Handler nào xử lý việc hủy booking? Tôi cần sửa logic để gửi thêm email notification khi hủy.",
       "expected_output": "Skill tìm đúng CancelBookingCommandHandler trong Features/Bookings/CancelBooking/, đọc README.md và Handler, giải thích flow hiện tại (fetch booking → call booking.Cancel() → save), sau đó chỉ ra chính xác chỗ cần thêm email notification (sau khi Cancel thành công, trước SaveChanges hoặc dùng domain event).",
       "files": [
-        "/home/manpham/projects/agent-skills/skills/dotnet/dotnet-find-handler-workspace/fake-project"
+        "/home/manpm/projects/newskills/skills/dotnet/dotnet-find-handler-workspace/fake-project"
       ]
     },
     {
@@ -22,7 +22,7 @@
       "prompt": "tính năng đăng ký người dùng làm gì vậy? đặc biệt là nó tích hợp với Keycloak như thế nào",
       "expected_output": "Skill tìm đúng RegisterUserCommandHandler trong Features/Users/RegisterUser/ (dù prompt chỉ nói 'đăng ký người dùng' không dùng tên handler cụ thể), đọc README.md và Handler, giải thích: tạo User entity → gọi IAuthenticationService.RegisterAsync (Keycloak) → set identityId → save. Đề cập đến việc đăng ký song song ở cả Keycloak và DB.",
       "files": [
-        "/home/manpham/projects/agent-skills/skills/dotnet/dotnet-find-handler-workspace/fake-project"
+        "/home/manpm/projects/newskills/skills/dotnet/dotnet-find-handler-workspace/fake-project"
       ]
     }
   ]

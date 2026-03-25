@@ -13,7 +13,7 @@
 | String defaults | `string.Empty` (not `""`) |
 | Null checks | Pattern matching (`entity is null`, `entity is not null`) |
 | Collections | `IReadOnlyList<T>` for return types |
-| Cancellation | Always pass `CancellationToken cancellationToken` |
+| Cancellation | Always pass `CancellationToken cancellationToken` to every async method — both the handler's `Handle` method and every repository/Dapper call inside it |
 
 ## CQRS Separation
 

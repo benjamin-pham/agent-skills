@@ -12,6 +12,7 @@ description: >
 metadata:
   related-skills:
     - dotnet-clean-architect
+    - dotnet-clean-feature
 ---
 
 # Minimal API Endpoints — Class-per-Endpoint Pattern

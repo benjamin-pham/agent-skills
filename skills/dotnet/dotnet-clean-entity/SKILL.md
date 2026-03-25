@@ -13,6 +13,7 @@ description: >
 metadata:
   related-skills:
     - dotnet-clean-architect
+    - dotnet-clean-repository
 ---
 
 # ASP.NET Core — Rich Domain Entity Generator
