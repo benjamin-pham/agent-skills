@@ -35,6 +35,7 @@ Uses real `dotnet` CLI commands — no manual file creation needed.
 | `references/application-abstractions.md` | ICommand, IQuery, ICommandHandler, IQueryHandler, ISqlConnectionFactory, ValidationBehavior, DI |
 | `references/infrastructure-foundation.md` | AppDbContext, BaseEntityConfiguration, Repository\<T\>, SqlConnectionFactory, DI |
 | `references/api-foundation.md` | IEndpoint, EndpointExtensions, Program.cs, appsettings.json |
+| `references/tests-scaffold.md` | 5 test projects under `tests/` — UnitTests, IntegrationTests, ArchitectureTests |
 
 ---
 
@@ -75,10 +76,19 @@ Then create **`{ProjectName}.slnx`** at the solution root. `.slnx` is a simple X
 
 ```xml
 <Solution>
-  <Project Path="src/{ProjectName}.Domain/{ProjectName}.Domain.csproj" />
-  <Project Path="src/{ProjectName}.Application/{ProjectName}.Application.csproj" />
-  <Project Path="src/{ProjectName}.Infrastructure/{ProjectName}.Infrastructure.csproj" />
-  <Project Path="src/{ProjectName}.API/{ProjectName}.API.csproj" />
+  <Folder Name="src">
+    <Project Path="src/{ProjectName}.Domain/{ProjectName}.Domain.csproj" />
+    <Project Path="src/{ProjectName}.Application/{ProjectName}.Application.csproj" />
+    <Project Path="src/{ProjectName}.Infrastructure/{ProjectName}.Infrastructure.csproj" />
+    <Project Path="src/{ProjectName}.API/{ProjectName}.API.csproj" />
+  </Folder>
+  <Folder Name="tests">
+    <Project Path="tests/{ProjectName}.Domain.UnitTests/{ProjectName}.Domain.UnitTests.csproj" />
+    <Project Path="tests/{ProjectName}.Application.UnitTests/{ProjectName}.Application.UnitTests.csproj" />
+    <Project Path="tests/{ProjectName}.Infrastructure.IntegrationTests/{ProjectName}.Infrastructure.IntegrationTests.csproj" />
+    <Project Path="tests/{ProjectName}.API.IntegrationTests/{ProjectName}.API.IntegrationTests.csproj" />
+    <Project Path="tests/{ProjectName}.ArchitectureTests/{ProjectName}.ArchitectureTests.csproj" />
+  </Folder>
 </Solution>
 ```
 
@@ -184,13 +194,34 @@ Read `references/api-foundation.md` and create all files listed there.
 
 ---
 
-## Step 10 — Verify
+## Step 10 — Verify source build
+
+```bash
+dotnet build src/
+```
+
+Fix any compilation errors in the source projects before continuing. The build must be green.
+
+---
+
+## Step 11 — Create test projects
+
+Read `references/tests-scaffold.md` and follow all steps there. This creates five test projects under `tests/`:
+
+- `{ProjectName}.Domain.UnitTests` — pure domain logic
+- `{ProjectName}.Application.UnitTests` — handlers and validators with mocked interfaces
+- `{ProjectName}.Infrastructure.IntegrationTests` — EF Core mappings and repositories via Testcontainers
+- `{ProjectName}.API.IntegrationTests` — full HTTP stack via WebApplicationFactory
+- `{ProjectName}.ArchitectureTests` — enforces Clean Architecture layer dependency rules
+
+After completing the steps in `tests-scaffold.md`, verify the full solution:
 
 ```bash
 dotnet build
+dotnet test --no-build
 ```
 
-Fix any compilation errors before marking this task done. The build must be green.
+The architecture tests should pass. All other test projects should show "No tests found" (correct — we deleted the generated stubs). Build must remain green.
 
 ---
 
@@ -208,6 +239,6 @@ Once the scaffold is complete, the following skills work immediately:
 
 - Target **.NET 10** (`net10.0`) and **C# 13** throughout.
 - Use **file-scoped namespaces** everywhere (`namespace Foo.Bar;` not `namespace Foo.Bar { }`).
-- The `.slnx` file is created at the solution root (XML-based format, .NET 9+). All source projects live under `src/`.
+- The `.slnx` file is created at the solution root (XML-based format, .NET 9+). Source projects live under `src/`, test projects under `tests/`. Both folders are grouped with `<Folder>` elements in the `.slnx`. Use `dotnet sln add` only for `.sln` files — write `.slnx` directly.
 - Connection string placeholder goes in `appsettings.Development.json` — never commit real credentials.
 - Run `dotnet build` after Step 1 to catch project reference issues early; run again at Step 9 for the full check.

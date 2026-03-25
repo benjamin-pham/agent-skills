@@ -3,7 +3,7 @@ name: dotnet-clean-unit-test
 description: >
   Generate unit test projects and test classes for ASP.NET Core Clean Architecture
   projects — xUnit + NSubstitute + FluentAssertions. Creates separate test projects
-  per layer (Domain.Tests, Application.Tests), scaffolds test infrastructure
+  per layer (Domain.UnitTests, Application.UnitTests), scaffolds test infrastructure
   (base classes, fixtures, helpers), and generates test classes with realistic
   test cases following Arrange-Act-Assert pattern.
   Trigger whenever the user wants to add unit tests, create test projects,
@@ -38,8 +38,8 @@ Infrastructure tests (EF Core, database) and API tests (WebApplicationFactory, H
 Find the `.slnx` file and identify `{ProjectName}`. Scan existing layers:
 
 ```
-src/{ProjectName}.Domain/          → generates tests/{ProjectName}.Domain.Tests/
-src/{ProjectName}.Application/     → generates tests/{ProjectName}.Application.Tests/
+src/{ProjectName}.Domain/          → tests/{ProjectName}.Domain.UnitTests/
+src/{ProjectName}.Application/     → tests/{ProjectName}.Application.UnitTests/
 ```
 
 Check what already exists:
@@ -50,16 +50,16 @@ Check what already exists:
   - e.g., `Application/Features/Orders/GetOrderById/GetOrderByIdQueryHandler.cs`
 - FluentValidation validators in the same operation folder as their handler
 
-### Step 2 — Create Test Projects
+### Step 2 — Verify Test Projects Exist
 
-Read `references/test-project-setup.md` for the complete setup guide. This step:
+The scaffold skill (`dotnet-clean-scaffold`) creates test projects automatically. Confirm they exist:
 
-1. Creates test projects under `tests/` folder
-2. Adds NuGet packages (xUnit, NSubstitute, FluentAssertions) to `Directory.Packages.props`
-3. Adds projects to the solution with correct references
-4. Creates shared test infrastructure (base classes, helpers)
+```
+tests/{ProjectName}.Domain.UnitTests/
+tests/{ProjectName}.Application.UnitTests/
+```
 
-Only create test projects for layers that exist in the source. If the user only has a Domain layer, only create `Domain.Tests`.
+If either project is missing (older solution scaffolded without them), read `references/test-project-setup.md` and create only the missing ones.
 
 ### Step 3 — Generate Test Classes
 
@@ -76,7 +76,7 @@ The test file mirrors the vertical slice path of its handler, under the test pro
 
 ```
 src/MyShop.Application/Features/Products/CreateProduct/CreateProductCommandHandler.cs
-tests/MyShop.Application.Tests/Features/Products/CreateProduct/CreateProductCommandHandlerTests.cs
+tests/MyShop.Application.UnitTests/Features/Products/CreateProduct/CreateProductCommandHandlerTests.cs
 ```
 
 Based on what the user asks for, generate test classes. There are two scenarios:

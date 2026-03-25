@@ -67,6 +67,7 @@ Enables **Central Package Management** — versions defined once, referenced by 
     <PackageVersion Include="Testcontainers.PostgreSql" Version="3.10.0" />
     <PackageVersion Include="Npgsql" Version="10.0.2" />
     <PackageVersion Include="Respawn" Version="6.2.1" />
+    <PackageVersion Include="NetArchTest.Rules" Version="1.3.2" />
   </ItemGroup>
 
 </Project>

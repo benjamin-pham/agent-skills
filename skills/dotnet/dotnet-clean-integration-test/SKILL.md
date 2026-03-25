@@ -39,8 +39,8 @@ Unit tests (handlers, domain logic, validators) belong in the `dotnet-clean-unit
 
 Find the `.slnx` file and identify `{ProjectName}`. Verify these exist:
 ```
-src/{ProjectName}.API/          → will reference this for WebApplicationFactory
-src/{ProjectName}.Infrastructure/ → has AppDbContext and repositories
+src/{ProjectName}.API/          → API.IntegrationTests (WebApplicationFactory endpoint tests)
+src/{ProjectName}.Infrastructure/ → Infrastructure.IntegrationTests (repository/EF Core tests)
 ```
 
 Check what features/entities exist so you know what test classes to generate:
@@ -48,13 +48,18 @@ Check what features/entities exist so you know what test classes to generate:
 - Repository interfaces in `Domain/Abstractions/`
 - `AppDbContext` in `Infrastructure/Data/`
 
-### Step 2 — Create the IntegrationTests Project
+### Step 2 — Verify Test Projects Exist
 
-Read `references/test-project-setup.md` for the full setup. This step:
-1. Creates `tests/{ProjectName}.IntegrationTests/` project
-2. Adds packages to `Directory.Packages.props`
-3. Adds project reference to the solution
-4. Exposes `Program` class for `WebApplicationFactory`
+The scaffold skill (`dotnet-clean-scaffold`) creates integration test projects automatically. Confirm they exist:
+
+```
+tests/{ProjectName}.API.IntegrationTests/
+tests/{ProjectName}.Infrastructure.IntegrationTests/
+```
+
+If either project is missing (older solution scaffolded without them), read `references/test-project-setup.md` and create only the missing ones.
+
+Also verify that `src/{ProjectName}.API/Program.cs` ends with `public partial class Program { }` — required by `WebApplicationFactory`. If missing, add it.
 
 ### Step 3 — Set Up Test Infrastructure
 
@@ -72,13 +77,13 @@ Based on what the user asks for, two scenarios:
 **Scenario A — "Set up integration tests for my project"** (broad request):
 - Complete Step 2 + Step 3 first
 - Scan features: find each endpoint group and each repository interface
-- For each endpoint group → generate `{Feature}EndpointTests.cs`
-- For each repository interface → generate `{Feature}RepositoryTests.cs`
+- For each endpoint group → generate `{Feature}EndpointTests.cs` under `API.IntegrationTests`
+- For each repository interface → generate `{Feature}RepositoryTests.cs` under `Infrastructure.IntegrationTests`
 
 **Scenario B — "Write integration tests for ProductsEndpoint"** (specific request):
-- Ensure project and test infrastructure exist (create if needed)
+- Verify the relevant test project exists (create if missing per Step 2)
 - Read the target endpoint/repository to understand its routes, inputs, and outputs
-- Generate exactly one test file
+- Generate exactly one test file in the appropriate project
 
 Read `references/endpoint-test-templates.md` for endpoint test class templates.
 Read `references/repository-test-templates.md` for repository test class templates.
@@ -87,7 +92,8 @@ Read `references/repository-test-templates.md` for repository test class templat
 
 ```bash
 dotnet build
-dotnet test tests/{ProjectName}.IntegrationTests
+dotnet test tests/{ProjectName}.API.IntegrationTests
+dotnet test tests/{ProjectName}.Infrastructure.IntegrationTests
 ```
 
 The first run will pull the Docker image — this can take 30–60 seconds. Fix any compilation or test failures before finishing.
