@@ -1,6 +1,6 @@
 # MSBuild Props — Central Package Management
 
-Create both files at the **solution root** (same level as the `.sln` file).
+Create both files at the **solution root** (same level as the `.slnx` file).
 
 ---
 
@@ -12,6 +12,7 @@ so individual `.csproj` files don't repeat them.
 ```xml
 <Project>
   <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
@@ -33,34 +34,44 @@ Enables **Central Package Management** — versions defined once, referenced by 
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
-  <ItemGroup Label="Shared">
-    <PackageVersion Include="MediatR" Version="14.1.0" />
+  <ItemGroup Label="Shared">    
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.5" />
   </ItemGroup>
 
   <ItemGroup Label="Application">
+    <PackageVersion Include="MediatR" Version="11.1.0" />
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
   </ItemGroup>
 
-  <ItemGroup Label="Infrastructure — choose one DB provider">
+  <ItemGroup Label="Infrastructure">
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.5" />
     <PackageVersion Include="Dapper" Version="2.1.72" />
   </ItemGroup>
 
   <ItemGroup Label="API">
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
-    <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
-    <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageVersion Include="Scalar.AspNetCore" Version="2.13.13" />
   </ItemGroup>
+
+  <ItemGroup Label="Testing">
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.1" />
+    <PackageVersion Include="NSubstitute" Version="5.3.0" />
+    <PackageVersion Include="FluentAssertions" Version="7.2.2" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0" />
+    <PackageVersion Include="Testcontainers.PostgreSql" Version="3.10.0" />
+    <PackageVersion Include="Npgsql" Version="10.0.2" />
+    <PackageVersion Include="Respawn" Version="6.2.1" />
+  </ItemGroup>
+
 </Project>
 ```
 
-> Include BOTH `Npgsql.EntityFrameworkCore.PostgreSQL` and `Microsoft.EntityFrameworkCore.SqlServer`
 > in `Directory.Packages.props` — having a version entry doesn't add a package, it just makes the
 > version available. Only projects that actually reference the package will pull it in.
 
@@ -72,16 +83,11 @@ After creating the props files, edit each generated `.csproj` to match these tem
 Key rules:
 - No `<Nullable>` or `<ImplicitUsings>` (inherited from Directory.Build.props)
 - No `Version` attribute on `<PackageReference>` (managed by Directory.Packages.props)
-- Keep `<TargetFramework>` in each project (they may differ — Domain/App/Infra are `net10.0`, API too)
 
 ### {ProjectName}.Domain.csproj
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="MediatR" />
@@ -94,10 +100,6 @@ Key rules:
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="MediatR" />
