@@ -76,13 +76,13 @@ Then create **`{ProjectName}.slnx`** at the solution root. `.slnx` is a simple X
 
 ```xml
 <Solution>
-  <Folder Name="src">
+  <Folder Name="/src/">
     <Project Path="src/{ProjectName}.Domain/{ProjectName}.Domain.csproj" />
     <Project Path="src/{ProjectName}.Application/{ProjectName}.Application.csproj" />
     <Project Path="src/{ProjectName}.Infrastructure/{ProjectName}.Infrastructure.csproj" />
     <Project Path="src/{ProjectName}.API/{ProjectName}.API.csproj" />
   </Folder>
-  <Folder Name="tests">
+  <Folder Name="/tests/">
     <Project Path="tests/{ProjectName}.Domain.UnitTests/{ProjectName}.Domain.UnitTests.csproj" />
     <Project Path="tests/{ProjectName}.Application.UnitTests/{ProjectName}.Application.UnitTests.csproj" />
     <Project Path="tests/{ProjectName}.Infrastructure.IntegrationTests/{ProjectName}.Infrastructure.IntegrationTests.csproj" />

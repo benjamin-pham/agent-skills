@@ -13,7 +13,7 @@
         "All 5 test projects exist in tree.txt: Bookings.Domain.UnitTests, Bookings.Application.UnitTests, Bookings.Infrastructure.IntegrationTests, Bookings.API.IntegrationTests, Bookings.ArchitectureTests",
         "Directory.Packages.props contains ManagePackageVersionsCentrally=true",
         "No PackageReference entry in any .csproj file has a Version attribute (CPM correctly configured)",
-        "AppDbContext.cs uses UseNpgsql (not UseSqlServer)",
+        "Infrastructure DependencyInjection.cs uses UseNpgsql to configure the database (not UseSqlServer)",
         "BaseEntity.cs, IRepository.cs, IUnitOfWork.cs, Result.cs, and Error.cs all exist in the Domain layer",
         "ValidationBehavior.cs exists in the Application/Behaviors directory",
         "Generated .cs files use file-scoped namespace syntax (e.g. 'namespace Bookings.Domain;' not 'namespace Bookings.Domain { }')"
@@ -31,7 +31,7 @@
         "All 5 test projects exist in tree.txt: EcommerceApi.Domain.UnitTests, EcommerceApi.Application.UnitTests, EcommerceApi.Infrastructure.IntegrationTests, EcommerceApi.API.IntegrationTests, EcommerceApi.ArchitectureTests",
         "Directory.Packages.props contains ManagePackageVersionsCentrally=true",
         "No PackageReference entry in any .csproj file has a Version attribute (CPM correctly configured)",
-        "AppDbContext.cs uses UseSqlServer (not UseNpgsql)",
+        "Infrastructure DependencyInjection.cs uses UseSqlServer to configure the database (not UseNpgsql)",
         "BaseEntity.cs, IRepository.cs, IUnitOfWork.cs, Result.cs, and Error.cs all exist in the Domain layer",
         "ValidationBehavior.cs exists in the Application/Behaviors directory",
         "Generated .cs files use file-scoped namespace syntax (e.g. 'namespace EcommerceApi.Domain;' not 'namespace EcommerceApi.Domain { }')"
@@ -49,7 +49,7 @@
         "All 5 test projects exist in tree.txt: TaskManager.Domain.UnitTests, TaskManager.Application.UnitTests, TaskManager.Infrastructure.IntegrationTests, TaskManager.API.IntegrationTests, TaskManager.ArchitectureTests",
         "Directory.Packages.props contains ManagePackageVersionsCentrally=true",
         "No PackageReference entry in any .csproj file has a Version attribute (CPM correctly configured)",
-        "AppDbContext.cs uses UseNpgsql (not UseSqlServer)",
+        "Infrastructure DependencyInjection.cs uses UseNpgsql to configure the database (not UseSqlServer)",
         "BaseEntity.cs, IRepository.cs, IUnitOfWork.cs, Result.cs, and Error.cs all exist in the Domain layer",
         "ValidationBehavior.cs exists in the Application/Behaviors directory",
         "Generated .cs files use file-scoped namespace syntax (e.g. 'namespace TaskManager.Domain;' not 'namespace TaskManager.Domain { }')"

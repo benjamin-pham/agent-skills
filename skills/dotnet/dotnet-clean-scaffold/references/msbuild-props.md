@@ -40,14 +40,16 @@ Enables **Central Package Management** — versions defined once, referenced by 
   </ItemGroup>
 
   <ItemGroup Label="Application">
-    <PackageVersion Include="MediatR" Version="11.1.0" />
+    <PackageVersion Include="MediatR" Version="12.4.1" />
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
   </ItemGroup>
 
   <ItemGroup Label="Infrastructure">
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.5" />
     <PackageVersion Include="Dapper" Version="2.1.72" />
+    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.4.0" />
   </ItemGroup>
 
   <ItemGroup Label="API">
@@ -122,13 +124,22 @@ Key rules:
   </PropertyGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Dapper" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
   </ItemGroup>
 
 </Project>
 ```
+
+> `FrameworkReference` gives access to `IHttpContextAccessor` and other ASP.NET Core types
+> used in `UserContext.cs`. `System.IdentityModel.Tokens.Jwt` is needed for `JwtRegisteredClaimNames`
+> (also used in `UserContext.cs`).
 
 ### {ProjectName}.Infrastructure.csproj — SQL Server
 
@@ -140,9 +151,14 @@ Key rules:
   </PropertyGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Dapper" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
   </ItemGroup>
 
 </Project>
